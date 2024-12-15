@@ -7,7 +7,7 @@
   <style>
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
-    #instructions {
+    #debug {
       position: absolute;
       top: 10px;
       left: 10px;
@@ -23,9 +23,10 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/webxr/ARButton.js"></script>
 </head>
 <body>
-<div id="instructions">Tap to place the object</div>
+<div id="debug">Debug info here</div>
 <script>
-  let scene, camera, renderer, reticle, glbModel;
+  let scene, camera, renderer, reticle, glbModel, hitTestSource = null;
+  const debug = document.getElementById('debug');
 
   async function init() {
     // Configuración inicial del render
@@ -33,7 +34,6 @@
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.xr.enabled = true;
-    renderer.xr.setReferenceSpaceType('local');
     document.body.appendChild(renderer.domElement);
 
     // Configurar escena y cámara
@@ -59,6 +59,9 @@
       glbModel = gltf.scene;
       glbModel.visible = false;
       scene.add(glbModel);
+      debug.textContent = "Model loaded successfully!";
+    }, undefined, (error) => {
+      debug.textContent = `Error loading model: ${error}`;
     });
 
     // Botón de AR
@@ -74,6 +77,8 @@
     scene.add(controller);
 
     window.addEventListener('resize', onWindowResize);
+
+    debug.textContent = "Initialization complete, waiting for AR session.";
   }
 
   function onWindowResize() {
@@ -82,10 +87,13 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
-  function onSelect() {
+  async function onSelect() {
     if (reticle.visible && glbModel) {
       glbModel.position.setFromMatrixPosition(reticle.matrix);
       glbModel.visible = true;
+      debug.textContent = "Model placed!";
+    } else {
+      debug.textContent = "Reticle not visible, try again.";
     }
   }
 
@@ -93,12 +101,24 @@
     renderer.setAnimationLoop((timestamp, frame) => {
       if (frame) {
         const session = renderer.xr.getSession();
-        const viewerSpace = session.requestReferenceSpace('viewer');
-        session.requestHitTestSource({ space: viewerSpace }).then((hitTestSource) => {
+
+        // Configurar hit test
+        if (!hitTestSource) {
+          session.requestReferenceSpace('viewer').then((viewerSpace) => {
+            session.requestHitTestSource({ space: viewerSpace }).then((source) => {
+              hitTestSource = source;
+              debug.textContent = "Hit test source created!";
+            });
+          });
+        }
+
+        // Procesar resultados de hit test
+        if (hitTestSource) {
+          const referenceSpace = renderer.xr.getReferenceSpace();
           const hitTestResults = frame.getHitTestResults(hitTestSource);
+
           if (hitTestResults.length > 0) {
             const hit = hitTestResults[0];
-            const referenceSpace = renderer.xr.getReferenceSpace();
             const pose = hit.getPose(referenceSpace);
 
             reticle.visible = true;
@@ -106,7 +126,7 @@
           } else {
             reticle.visible = false;
           }
-        }).catch(console.error);
+        }
       }
       renderer.render(scene, camera);
     });
