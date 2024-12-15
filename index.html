@@ -3,137 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Experience</title>
+  <title>AR Example</title>
+  <script type="module">
+    import '@google/model-viewer';
+  </script>
   <style>
-    body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
-    #debug {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: white;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 10px;
-      font-family: Arial, sans-serif;
-      z-index: 10;
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    model-viewer {
+      width: 100%;
+      height: 100vh;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/examples/js/webxr/ARButton.js"></script>
 </head>
 <body>
-<div id="debug">Debug info here</div>
-<script>
-  let scene, camera, renderer, reticle, glbModel, hitTestSource = null;
-  const debug = document.getElementById('debug');
-
-  async function init() {
-    // Configuración inicial del render
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.xr.enabled = true;
-    document.body.appendChild(renderer.domElement);
-
-    // Configurar escena y cámara
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
-    scene.add(camera);
-
-    // Luz para iluminar el modelo
-    const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-    scene.add(light);
-
-    // Retícula para detección de superficie
-    const geometry = new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2);
-    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    reticle = new THREE.Mesh(geometry, material);
-    reticle.matrixAutoUpdate = false;
-    reticle.visible = false;
-    scene.add(reticle);
-
-    // Cargar el modelo GLB
-    const loader = new THREE.GLTFLoader();
-    loader.load('scene.glb', (gltf) => {
-      glbModel = gltf.scene;
-      glbModel.visible = false;
-      scene.add(glbModel);
-      debug.textContent = "Model loaded successfully!";
-    }, undefined, (error) => {
-      debug.textContent = `Error loading model: ${error}`;
-    });
-
-    // Botón de AR
-    const arButton = THREE.ARButton.createButton(renderer, {
-      optionalFeatures: ['hit-test'],
-      requiredFeatures: ['hit-test'],
-    });
-    document.body.appendChild(arButton);
-
-    // Manejo de eventos para colocación
-    const controller = renderer.xr.getController(0);
-    controller.addEventListener('select', onSelect);
-    scene.add(controller);
-
-    window.addEventListener('resize', onWindowResize);
-
-    debug.textContent = "Initialization complete, waiting for AR session.";
-  }
-
-  function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  }
-
-  async function onSelect() {
-    if (reticle.visible && glbModel) {
-      glbModel.position.setFromMatrixPosition(reticle.matrix);
-      glbModel.visible = true;
-      debug.textContent = "Model placed!";
-    } else {
-      debug.textContent = "Reticle not visible, try again.";
-    }
-  }
-
-  function animate() {
-    renderer.setAnimationLoop((timestamp, frame) => {
-      if (frame) {
-        const session = renderer.xr.getSession();
-
-        // Configurar hit test
-        if (!hitTestSource) {
-          session.requestReferenceSpace('viewer').then((viewerSpace) => {
-            session.requestHitTestSource({ space: viewerSpace }).then((source) => {
-              hitTestSource = source;
-              debug.textContent = "Hit test source created!";
-            });
-          });
-        }
-
-        // Procesar resultados de hit test
-        if (hitTestSource) {
-          const referenceSpace = renderer.xr.getReferenceSpace();
-          const hitTestResults = frame.getHitTestResults(hitTestSource);
-
-          if (hitTestResults.length > 0) {
-            const hit = hitTestResults[0];
-            const pose = hit.getPose(referenceSpace);
-
-            reticle.visible = true;
-            reticle.matrix.fromArray(pose.transform.matrix);
-          } else {
-            reticle.visible = false;
-          }
-        }
-      }
-      renderer.render(scene, camera);
-    });
-  }
-
-  init();
-  animate();
-</script>
+  <!-- El modelo GLB -->
+  <model-viewer 
+    src="scene.glb" 
+    alt="A 3D model" 
+    auto-rotate 
+    camera-controls 
+    ar 
+    ar-modes="webxr scene-viewer quick-look" 
+    shadow-intensity="1" 
+    ios-src="path-to-your-model.usdz" 
+    style="width: 100%; height: 100%;">
+  </model-viewer>
 </body>
 </html>
