@@ -13,6 +13,7 @@
     model-viewer {
       width: 100%;
       height: 100%;
+      background-color: #000;
     }
     #logo {
       position: absolute;
@@ -29,31 +30,50 @@
       z-index: 3;
       font-size: 12px;
     }
+    #instruction {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 18px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
+  <div id="instruction">Apunta con la cámara al asiento de la silla</div>
   <model-viewer
     src="./scene.glb"
     ar
     ar-modes="scene-viewer quick-look webxr"
+    ar-scale="fixed"
+    ar-placement="floor"
     camera-controls
     autoplay
     environment-image="neutral"
     shadow-intensity="1"
     scale="0.5 0.5 0.5"
     position="0 0.5 0"
-    ar-scale="fixed"
-    ar-placement="floor"
-    on-ar-status="checkAR(event)">
+    on-ar-status="checkAR(event)"
+    on-error="handleError(event)">
   </model-viewer>
   <img id="logo" src="logo.png" alt="Logo">
   <div id="copyright">© 2024 Tu Marca</div>
 
   <script>
+    // Muestra una alerta si hay un problema con AR
     function checkAR(event) {
       if (event.detail.status === 'failed') {
         alert('Tu dispositivo no admite RA. Por favor, utiliza un dispositivo compatible.');
       }
+    }
+
+    // Muestra errores en la consola para depuración
+    function handleError(event) {
+      console.error('Error:', event.detail);
     }
   </script>
 </body>
