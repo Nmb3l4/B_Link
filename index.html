@@ -1,108 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Experience</title>
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #000;
-      color: white;
-    }
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      background-color: rgba(0, 0, 0, 0.8);
-      z-index: 10;
-    }
-    .overlay.hidden {
-      display: none;
-    }
-    .diana {
-      width: 80px;
-      height: 80px;
-      border: 3px solid white;
-      border-radius: 50%;
-      position: relative;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(1.5);
-        opacity: 0;
-      }
-    }
-    footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      text-align: center;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="overlay" id="overlay">
-    <p>Apunta con la cámara al asiento de la silla</p>
-    <div class="diana"></div>
-    <button id="start-ar">Iniciar experiencia</button>
-  </div>
-
-  <model-viewer
-  src="./scene.glb"
-  camera-controls
-  auto-rotate
-  style="width: 100%; height: 100%;"></model-viewer>
-
-  <audio id="tech-sound" src="./liquid-tech.mp3"></audio>
-
-  <footer>
-    <p>© 2024 Ricardo Nombela. Todos los derechos reservados.</p>
-  </footer>
-
-  <script>
-    const overlay = document.getElementById('overlay');
-    const startARButton = document.getElementById('start-ar');
-    const arViewer = document.getElementById('ar-viewer');
-    const sound = document.getElementById('tech-sound');
-
-    startARButton.addEventListener('click', () => {
-      // Mostrar el visor AR
-      overlay.classList.add('hidden');
-      arViewer.style.display = 'block';
-      
-      // Pedir permiso para la cámara
-      navigator.permissions.query({ name: 'camera' }).then((result) => {
-        if (result.state === 'granted' || result.state === 'prompt') {
-          console.log('Cámara lista');
-        } else {
-          alert('Se necesita permiso para usar la cámara.');
-        }
-      });
-
-      // Reproducir sonido al iniciar la experiencia
-      arViewer.addEventListener('ar-status', (event) => {
-        if (event.detail.status === 'session-started') {
-          sound.play();
-        }
-      });
-    });
-  </script>
-</body>
+<html>
+  <head>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  </head>
+  <body>
+    <model-viewer
+      src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+      ar
+      ar-modes="scene-viewer webxr quick-look"
+      camera-controls
+      auto-rotate
+      style="width: 100%; height: 100%;">
+    </model-viewer>
+  </body>
 </html>
