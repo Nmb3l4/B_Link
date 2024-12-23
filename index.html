@@ -8,6 +8,7 @@
     body {
       margin: 0;
       overflow: hidden;
+      background-color: black;
     }
     model-viewer {
       width: 100%;
@@ -28,19 +29,56 @@
       z-index: 3;
       font-size: 12px;
     }
+    #instruction {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 18px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
+  <div id="instruction">Apunta con la cámara al asiento de la silla</div>
   <model-viewer
+    id="modelViewer"
     src="./scene.glb"
     ar
     ar-modes="scene-viewer quick-look webxr"
     camera-controls
+    autoplay
     environment-image="neutral"
     shadow-intensity="1"
-    autoplay>
+    ar-placement="floor"
+    ar-scale="fixed"
+    scale="0.5 0.5 0.5"
+    position="0 0.5 0">
   </model-viewer>
   <img id="logo" src="logo.png" alt="Logo">
-  <div id="copyright">© 2024 Tu Marca</div>
+  <div id="copyright">© 2024 Ricardo Nombela</div>
+
+  <script>
+    // Hacer que la RA se active de manera predeterminada en lugar de tener que hacer clic en el ícono
+    const modelViewer = document.querySelector('#modelViewer');
+    modelViewer.setAttribute('ar', 'true');
+    modelViewer.setAttribute('ar-modes', 'scene-viewer quick-look webxr');
+    
+    // Asegúrate de que el objeto flote y se ajuste a la superficie correctamente
+    modelViewer.addEventListener('ar-status', (event) => {
+      if (event.detail.status === 'not-found') {
+        alert('No se encontró una superficie compatible.');
+      }
+    });
+
+    // Para mejorar la experiencia, puedes agregar un sonido de fondo o animación cuando el modelo se coloca
+    modelViewer.addEventListener('ar-placement', () => {
+      const audio = new Audio('sound.mp3'); // Cambia esto a la ubicación de tu archivo de sonido
+      audio.play();
+    });
+  </script>
 </body>
 </html>
