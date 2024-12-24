@@ -14,7 +14,7 @@
     model-viewer {
       width: 100%;
       height: 100%;
-      background-color: teal;
+      background-color: gray;
     }
     #logo {
       position: absolute;
@@ -76,11 +76,6 @@
   <script>
     const modelViewer = document.getElementById('modelViewer');
 
-    // Reproducir todas las animaciones
-    modelViewer.addEventListener('load', () => {
-      const allAnimations = modelViewer.availableAnimations || [];
-      allAnimations.forEach((animation) => modelViewer.playAnimation(animation));
-    });
 
     // Intentar abrir directamente en AR
     document.addEventListener("DOMContentLoaded", () => {
