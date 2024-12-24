@@ -16,7 +16,7 @@
       model-viewer {
         width: 100%;
         height: 100%;
-        background-color: grey;
+        background-color: black;
       }
 
       #logo {
@@ -61,7 +61,7 @@
       ios-src="scene.usdz"
       alt="Modelo animado"
       ar
-      ar-modes="webxr scene-viewer quick-look"
+      ar-modes="scene-viewer quick-look webxr"
       camera-controls
       autoplay
       environment-image="neutral"
@@ -77,13 +77,6 @@
     <script>
       const modelViewer = document.getElementById('modelViewer');
 
-      // Priorizar experiencia AR
-      document.addEventListener('DOMContentLoaded', () => {
-        if (modelViewer.canActivateAR) {
-          modelViewer.activateAR();
-        }
-      });
-
       // Reproducir sonido al entrar en AR
       modelViewer.addEventListener('ar-status', (event) => {
         if (event.detail.status === 'session-started') {
@@ -92,7 +85,13 @@
           audio.play();
         }
       });
+
+      // Mostrar advertencias si AR no es compatible
+      modelViewer.addEventListener('ar-status', (event) => {
+        if (event.detail.status === 'failed') {
+          alert('AR no está disponible en tu dispositivo o navegador.');
+        }
+      });
     </script>
   </body>
 </html>
-
