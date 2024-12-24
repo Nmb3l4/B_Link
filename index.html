@@ -12,7 +12,7 @@
     model-viewer {
       width: 100%;
       height: 100%;
-      background-color: black;
+      background-color: blue;
     }
     #logo {
       position: absolute;
@@ -51,17 +51,20 @@
   <model-viewer
     id="modelViewer"
     src="./scene.glb"
+    alt="B_Link"
     ar
-    ar-modes="scene-viewer quick-look webxr"
+    ar-modes="webxr scene-viewer"
     camera-controls
     autoplay
+    touch-action="pan-y"
     animation-name=""
     environment-image="neutral"
     shadow-intensity="1"
     auto-rotate
     ar-placement="floor"
     position="0 0.5 0"
-    scale="0.5 0.5 0.5">
+    scale="0.2 0.2 0.2">
+
   </model-viewer>
 
   <!-- Logo y Copyright -->
