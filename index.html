@@ -53,16 +53,15 @@
     src="./scene.glb"
     ar
     ar-modes="scene-viewer quick-look webxr"
-    ar-scale="fixed"
     camera-controls
     autoplay
-    animation-name="Keyaction" <!-- Asegúrate de que este sea el nombre de tu animación -->
+    animation-name=""
     environment-image="neutral"
     shadow-intensity="1"
     auto-rotate
     ar-placement="floor"
-    position="0 1 0"
-    scale="0.2 0.2 0.2">
+    position="0 0.5 0"
+    scale="0.5 0.5 0.5">
   </model-viewer>
 
   <!-- Logo y Copyright -->
@@ -72,19 +71,22 @@
   <script>
     const modelViewer = document.getElementById('modelViewer');
 
+    // Reproducir todas las animaciones
+    modelViewer.addEventListener('load', () => {
+      const allAnimations = modelViewer.availableAnimations || [];
+      allAnimations.forEach((animation) => modelViewer.playAnimation(animation));
+    });
+
     // Intentar abrir directamente en AR
     document.addEventListener("DOMContentLoaded", () => {
-      const supportsAR = modelViewer.canActivateAR;
-      if (supportsAR) {
+      if (modelViewer.canActivateAR) {
         modelViewer.activateAR();
-      } else {
-        console.warn("AR no es compatible con este dispositivo.");
       }
     });
 
-    // Agregar sonido al colocar el modelo
+    // Reproducir sonido al colocar el modelo
     modelViewer.addEventListener('ar-placement', () => {
-      const audio = new Audio('Underwater.mp3'); // Cambia 'sound.mp3' por la ruta de tu archivo
+      const audio = new Audio('underwater.mp3'); // Cambia 'sound.mp3' por tu archivo
       audio.play();
     });
   </script>
