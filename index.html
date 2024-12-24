@@ -1,96 +1,98 @@
+<!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Experience</title>
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-    model-viewer {
-      width: 100%;
-      height: 100%;
-      background-color: black;
-    }
-    #logo {
-      position: absolute;
-      bottom: 50px;
-      left: 10px;
-      z-index: 3;
-      width: 30px;
-    }
-    #copyright {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      color: black;
-      z-index: 3;
-      font-size: 12px;
-    }
-    #instruction {
-      position: absolute;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      color: black;
-      font-size: 18px;
-      background: rgba(255, 255, 255, 0.8);
-      padding: 10px 20px;
-      border-radius: 8px;
-      z-index: 3;
-    }
-  </style>
-</head>
-<body>
-  <!-- Instrucción visible -->
-  <div id="instruction">Apunta con la cámara al asiento de la silla</div>
-
-  <!-- Modelo con ModelViewer -->
-  <model-viewer
-    id="modelViewer"
-    src="./scene.glb"
-    alt="B_Link"
-    ar
-    ar-modes="webxr scene-viewer"
-    camera-controls
-    autoplay
-    touch-action="pan-y"
-    environment-image="estudio.jpg"
-    shadow-intensity="1"
-    auto-rotate
-    ar-placement="floor"
-    position="0 0.5 0"
-    scale="0.2 0.2 0.2">
-
-  </model-viewer>
-
-  <!-- Logo y Copyright -->
-  <img id="logo" src="logo.png" alt="Logo">
-  <div id="copyright">© 2024 Ricardo Nombela</div>
-
-  <script>
-    const modelViewer = document.getElementById('modelViewer');
-
-    // Reproducir todas las animaciones
-    modelViewer.addEventListener('load', () => {
-      const allAnimations = modelViewer.availableAnimations || [];
-      allAnimations.forEach((animation) => modelViewer.playAnimation(animation));
-    });
-
-    // Intentar abrir directamente en AR
-    document.addEventListener("DOMContentLoaded", () => {
-      if (modelViewer.canActivateAR) {
-        modelViewer.activateAR();
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>AR Experience</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
       }
-    });
 
-    // Reproducir sonido al colocar el modelo
-    modelViewer.addEventListener('ar-placement', () => {
-      const audio = new Audio('underwater.mp3'); // Cambia 'sound.mp3' por tu archivo
-      audio.play();
-    });
-  </script>
-</body>
+      model-viewer {
+        width: 100%;
+        height: 100%;
+        background-color: grey;
+      }
+
+      #logo {
+        position: absolute;
+        bottom: 50px;
+        left: 10px;
+        z-index: 3;
+        width: 50px;
+      }
+
+      #copyright {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        color: white;
+        z-index: 3;
+        font-size: 12px;
+      }
+
+      #instruction {
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 18px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px 20px;
+        border-radius: 8px;
+        z-index: 3;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Instrucción visible -->
+    <div id="instruction">Apunta con la cámara al asiento de la silla</div>
+
+    <!-- Modelo con ModelViewer -->
+    <model-viewer
+      id="modelViewer"
+      src="scene.glb"
+      ios-src="scene.usdz"
+      alt="Modelo animado"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      camera-controls
+      autoplay
+      environment-image="neutral"
+      shadow-intensity="1"
+      auto-rotate
+      scale="0.2 0.2 0.2">
+    </model-viewer>
+
+    <!-- Logo y Copyright -->
+    <img id="logo" src="logo.png" alt="Logo">
+    <div id="copyright">&copy; 2024 Ricardo Nombela</div>
+
+    <script>
+      const modelViewer = document.getElementById('modelViewer');
+
+      // Priorizar experiencia AR
+      document.addEventListener('DOMContentLoaded', () => {
+        if (modelViewer.canActivateAR) {
+          modelViewer.activateAR();
+        }
+      });
+
+      // Reproducir sonido al entrar en AR
+      modelViewer.addEventListener('ar-status', (event) => {
+        if (event.detail.status === 'session-started') {
+          const audio = new Audio('underwater.mp3');
+          audio.loop = true;
+          audio.play();
+        }
+      });
+    </script>
+  </body>
 </html>
+
