@@ -64,9 +64,8 @@
     shadow-intensity="1"
     auto-rotate
     ar-placement="floor"
-    position="0 0.5 0"
+    position="0 0 0"
     scale="0.2 0.2 0.2">
-
   </model-viewer>
 
   <!-- Logo y Copyright -->
@@ -76,21 +75,41 @@
   <script>
     const modelViewer = document.getElementById('modelViewer');
 
+    // Añadir una animación de flotación
+    let startTime = null;
+    const animationDuration = 2000; // Duración en milisegundos
+    const floatAmplitude = 0.05; // Amplitud de la oscilación
+    const floatSpeed = 0.002; // Velocidad de la oscilación
 
-    // Intentar abrir directamente en AR
-    document.addEventListener("DOMContentLoaded", () => {
-      if (modelViewer.canActivateAR) {
-        modelViewer.activateAR();
+    function animateModel(timestamp) {
+      if (!startTime) startTime = timestamp;
+
+      const elapsed = timestamp - startTime;
+      const yPosition = 0.5 + Math.sin(elapsed * floatSpeed) * floatAmplitude;
+
+      modelViewer.setAttribute('position', `0 ${yPosition} 0`);
+
+      requestAnimationFrame(animateModel);
+    }
+
+    requestAnimationFrame(animateModel);
+
+    // Reproducir sonido al colocar el modelo
+    let audio;
+    modelViewer.addEventListener('ar-placement', () => {
+      if (!audio) {
+        audio = new Audio('underwater.mp3'); // Cambia 'underwater.mp3' por tu archivo
+        audio.loop = true;
+        audio.volume = 0.5;
+        audio.play();
       }
     });
 
-    // Reproducir sonido al colocar el modelo
-    modelViewer.addEventListener('ar-placement', () => {
-      const audio = new Audio('underwater.mp3'); // Cambia 'sound.mp3' por tu archivo
-      audio.play();
-    });
+    // Reducir la velocidad de rotación automática
+    modelViewer.autoRotateDelay = 5000;
   </script>
-  <!--  Compatibilidad con navegadores modernos -->
+
+  <!-- Compatibilidad con navegadores modernos -->
   <script type="module"
       src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js">
   </script>
